@@ -55,7 +55,3 @@ export CGO_CXXFLAGS="-I{{ path to your working directory }}/tmp/n4.4/include/",
 export CGO_CFLAGS="-I{{ path to your working directory }}/tmp/n4.4/include/",
 export PKG_CONFIG_PATH="{{ path to your working directory }}/tmp/n4.4/lib/pkgconfig",
 ```
-
-# Why avgo?
-
-After maintaining for several years the most starred [fork](https://github.com/bubbajoe/goav) of [goav](https://github.com/giorgisio/goav), I've decided to write from scratch my own C bindings to fix most of the problems I still encountered using `goav`.
