@@ -1,4 +1,4 @@
-package astiav
+package avgo
 
 //#cgo pkg-config: libavutil
 //#include <libavutil/avutil.h>
@@ -7,7 +7,7 @@ import "C"
 
 type Error int
 
-// https://github.com/FFmpeg/FFmpeg/blob/n5.0/libavutil/error.h#L51
+// https://github.com/FFmpeg/FFmpeg/blob/n4.4/libavutil/error.h#L51
 const (
 	ErrBsfNotFound      = Error(C.AVERROR_BSF_NOT_FOUND)
 	ErrBufferTooSmall   = Error(C.AVERROR_BUFFER_TOO_SMALL)

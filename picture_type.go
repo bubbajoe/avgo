@@ -1,10 +1,10 @@
-package astiav
+package avgo
 
 //#cgo pkg-config: libavutil
 //#include <libavutil/avutil.h>
 import "C"
 
-// https://github.com/FFmpeg/FFmpeg/blob/n5.0/libavutil/avutil.h#L272
+// https://github.com/FFmpeg/FFmpeg/blob/n4.4/libavutil/avutil.h#L272
 type PictureType C.enum_AVPictureType
 
 const (

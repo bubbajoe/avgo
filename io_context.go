@@ -1,4 +1,4 @@
-package astiav
+package avgo
 
 /*
 #cgo pkg-config: libavformat
@@ -20,7 +20,7 @@ var (
 	ioContextCallbacks = make([]*ioContextCbs, 0)
 )
 
-// https://github.com/FFmpeg/FFmpeg/blob/n5.0/libavformat/avio.h#L161
+// https://github.com/FFmpeg/FFmpeg/blob/n4.4/libavformat/avio.h#L161
 type IOContext struct {
 	c *C.struct_AVIOContext
 }
@@ -100,7 +100,7 @@ func AllocIOContextReaderAndSeeker(
 					if err == io.EOF {
 						return int(ErrEof)
 					}
-					Logf(LogLevelError, "[astiav] read error: %v", err)
+					Logf(LogLevelError, "[avgo] read error: %v", err)
 					return int(ErrEio)
 				}
 				return n
@@ -115,7 +115,7 @@ func AllocIOContextReaderAndSeeker(
 				}
 				n, err := skr.Seek(offset, whence)
 				if err != nil {
-					Logf(LogLevelError, "[astiav] seek error: %s\n", err)
+					Logf(LogLevelError, "[avgo] seek error: %s\n", err)
 					return -1
 				}
 				// Logf(LogLevelInfo, "seek %d %d > %d\n", offset, whence, n)

@@ -1,4 +1,4 @@
-package astiav
+package avgo
 
 //#cgo pkg-config: libavfilter
 //#include <libavfilter/avfilter.h>
@@ -8,7 +8,7 @@ import (
 	"unsafe"
 )
 
-// https://github.com/FFmpeg/FFmpeg/blob/n5.0/libavfilter/avfilter.h#L861
+// https://github.com/FFmpeg/FFmpeg/blob/n4.4/libavfilter/avfilter.h#L861
 type FilterGraph struct {
 	c *C.struct_AVFilterGraph
 }
@@ -43,9 +43,13 @@ func (args FilterArgs) String() string {
 }
 
 func (g *FilterGraph) NewFilterContext(f *Filter, name string, args FilterArgs) (*FilterContext, error) {
+	return g.NewFilterContextRawArgs(f, name, args.String())
+}
+
+func (g *FilterGraph) NewFilterContextRawArgs(f *Filter, name, args string) (*FilterContext, error) {
 	ca := (*C.char)(nil)
 	if len(args) > 0 {
-		ca = C.CString(args.String())
+		ca = C.CString(args)
 		defer C.free(unsafe.Pointer(ca))
 	}
 	cn := C.CString(name)
@@ -54,6 +58,19 @@ func (g *FilterGraph) NewFilterContext(f *Filter, name string, args FilterArgs) 
 	err := newError(C.avfilter_graph_create_filter(&fc.c, f.c, cn, ca, nil, g.c))
 	return fc, err
 }
+
+// func (g *FilterGraph) NewFilterContextByName(fc *FilterContext, name string, args FilterArgs) (*FilterContext, error) {
+// 	ca := (*C.char)(nil)
+// 	if args != nil && len(args) > 0 {
+// 		ca = C.CString(args.String())
+// 		defer C.free(unsafe.Pointer(ca))
+// 	}
+// 	cn := C.CString(name)
+// 	defer C.free(unsafe.Pointer(cn))
+// 	nfc := FindFilterByName(name)
+// 	err := newError(C.avfilter_graph_create_filter(&fc.c, nfc.c, nil, ca, nil, g.c))
+// 	return nfc, err
+// }
 
 func (g *FilterGraph) Parse(content string, inputs, outputs *FilterInOut) error {
 	cc := C.CString(content)

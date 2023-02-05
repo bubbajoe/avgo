@@ -1,10 +1,10 @@
-package astiav
+package avgo
 
 //#cgo pkg-config: libavutil
 //#include <libavutil/pixfmt.h>
 import "C"
 
-// https://github.com/FFmpeg/FFmpeg/blob/n5.0/libavutil/pixfmt.h#L616
+// https://github.com/FFmpeg/FFmpeg/blob/n4.4/libavutil/pixfmt.h#L616
 type ChromaLocation C.enum_AVChromaLocation
 
 const (

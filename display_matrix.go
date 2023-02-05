@@ -1,4 +1,4 @@
-package astiav
+package avgo
 
 //#cgo pkg-config: libavutil
 //#include <libavutil/display.h>
@@ -14,7 +14,7 @@ type DisplayMatrix [9]uint32
 func NewDisplayMatrixFromBytes(b []byte) (m *DisplayMatrix, err error) {
 	// Check length
 	if len(b) < 36 {
-		err = fmt.Errorf("astiav: invalid length %d < 36", len(b))
+		err = fmt.Errorf("avgo: invalid length %d < 36", len(b))
 		return
 	}
 

@@ -1,10 +1,11 @@
-package astiav
+package avgo
 
 //#cgo pkg-config: libavcodec
 //#include <libavcodec/avcodec.h>
 import "C"
+import "unsafe"
 
-// https://github.com/FFmpeg/FFmpeg/blob/n5.0/libavcodec/codec_par.h#L52
+// https://github.com/FFmpeg/FFmpeg/blob/n4.4/libavcodec/codec_par.h#L52
 type CodecParameters struct {
 	c *C.struct_AVCodecParameters
 }
@@ -22,6 +23,15 @@ func newCodecParametersFromC(c *C.struct_AVCodecParameters) *CodecParameters {
 
 func (cp *CodecParameters) Free() {
 	C.avcodec_parameters_free(&cp.c)
+}
+
+func (cp *CodecParameters) Extradata() []byte {
+	return C.GoBytes(unsafe.Pointer(cp.c.extradata), C.int(cp.c.extradata_size))
+}
+
+func (cp *CodecParameters) SetExtradata(data []byte) {
+	cp.c.extradata = (*C.uint8_t)(C.CBytes(data))
+	cp.c.extradata_size = C.int(len(data))
 }
 
 func (cp *CodecParameters) BitRate() int64 {

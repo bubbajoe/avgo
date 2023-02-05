@@ -1,4 +1,4 @@
-package astiav
+package avgo
 
 //#cgo pkg-config: libavutil
 //#include <libavutil/channel_layout.h>
@@ -6,7 +6,7 @@ import "C"
 
 type ChannelLayout uint64
 
-// https://github.com/FFmpeg/FFmpeg/blob/n5.0/libavutil/channel_layout.h#L90
+// https://github.com/FFmpeg/FFmpeg/blob/n4.4/libavutil/channel_layout.h#L90
 const (
 	ChannelLayoutMono            = ChannelLayout(C.AV_CH_LAYOUT_MONO)
 	ChannelLayoutStereo          = ChannelLayout(C.AV_CH_LAYOUT_STEREO)

@@ -1,4 +1,4 @@
-package astiav
+package avgo
 
 //#cgo pkg-config: libavcodec
 //#include <libavcodec/avcodec.h>
@@ -7,7 +7,7 @@ import (
 	"unsafe"
 )
 
-// https://github.com/FFmpeg/FFmpeg/blob/n5.0/libavcodec/codec.h#L202
+// https://github.com/FFmpeg/FFmpeg/blob/n4.4/libavcodec/codec.h#L202
 type Codec struct {
 	c *C.struct_AVCodec
 }

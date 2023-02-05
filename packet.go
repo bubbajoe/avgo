@@ -1,4 +1,4 @@
-package astiav
+package avgo
 
 //#cgo pkg-config: libavcodec
 //#include <libavcodec/avcodec.h>
@@ -8,7 +8,7 @@ import (
 	"unsafe"
 )
 
-// https://github.com/FFmpeg/FFmpeg/blob/n5.0/libavcodec/packet.h#L350
+// https://github.com/FFmpeg/FFmpeg/blob/n4.4/libavcodec/packet.h#L350
 type Packet struct {
 	c *C.struct_AVPacket
 }
@@ -78,7 +78,7 @@ func (p *Packet) AddSideData(t PacketSideDataType, data []byte) error {
 	// Create buf
 	buf := (*C.uint8_t)(C.av_malloc(C.size_t(len(data))))
 	if buf == nil {
-		return errors.New("astiav: allocating buffer failed")
+		return errors.New("avgo: allocating buffer failed")
 	}
 	C.memcpy(unsafe.Pointer(buf), unsafe.Pointer(&data[0]), C.size_t(len(data)))
 
@@ -140,7 +140,7 @@ func (p *Packet) FromData(data []byte) (err error) {
 	// Create buf
 	buf := (*C.uint8_t)(C.av_malloc(C.size_t(len(data))))
 	if buf == nil {
-		err = errors.New("astiav: allocating buffer failed")
+		err = errors.New("avgo: allocating buffer failed")
 		return
 	}
 

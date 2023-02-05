@@ -1,11 +1,12 @@
-package astiav
+package avgo
 
 //#cgo pkg-config: libavcodec libavutil
 //#include <libavcodec/avcodec.h>
 //#include <libavutil/frame.h>
 import "C"
+import "unsafe"
 
-// https://github.com/FFmpeg/FFmpeg/blob/n5.0/libavcodec/avcodec.h#L383
+// https://github.com/FFmpeg/FFmpeg/blob/n4.4/libavcodec/avcodec.h#L383
 type CodecContext struct {
 	c *C.struct_AVCodecContext
 }
@@ -67,6 +68,10 @@ func (cc *CodecContext) ChromaLocation() ChromaLocation {
 
 func (cc *CodecContext) CodecID() CodecID {
 	return CodecID(cc.c.codec_id)
+}
+
+func (cc *CodecContext) SetCodecID(cid CodecID) {
+	cc.c.codec_id = uint32(cid)
 }
 
 func (cc *CodecContext) ColorPrimaries() ColorPrimaries {
@@ -211,6 +216,15 @@ func (cc *CodecContext) Width() int {
 
 func (cc *CodecContext) SetWidth(width int) {
 	cc.c.width = C.int(width)
+}
+
+func (cc *CodecContext) Extradata() []byte {
+	return C.GoBytes(unsafe.Pointer(cc.c.extradata), C.int(cc.c.extradata_size))
+}
+
+func (cc *CodecContext) SetExtradata(data []byte) {
+	cc.c.extradata = (*C.uint8_t)(unsafe.Pointer(&data[0]))
+	cc.c.extradata_size = C.int(len(data))
 }
 
 func (cc *CodecContext) Open(c *Codec, d *Dictionary) error {

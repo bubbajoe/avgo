@@ -1,10 +1,10 @@
-package astiav
+package avgo
 
 //#cgo pkg-config: libavformat
 //#include <libavformat/avformat.h>
 import "C"
 
-// https://github.com/FFmpeg/FFmpeg/blob/n5.0/libavformat/avformat.h#L650
+// https://github.com/FFmpeg/FFmpeg/blob/n4.4/libavformat/avformat.h#L650
 type InputFormat struct {
 	c *C.struct_AVInputFormat
 }

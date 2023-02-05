@@ -1,4 +1,4 @@
-package astiav
+package avgo
 
 //#cgo pkg-config: libavcodec libavutil
 //#include <libavcodec/avcodec.h>
@@ -9,7 +9,7 @@ import (
 	"unsafe"
 )
 
-// https://github.com/FFmpeg/FFmpeg/blob/n5.0/libavutil/dict.h#L84
+// https://github.com/FFmpeg/FFmpeg/blob/n4.4/libavutil/dict.h#L84
 type Dictionary struct {
 	c *C.struct_AVDictionary
 }

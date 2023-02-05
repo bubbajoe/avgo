@@ -1,10 +1,10 @@
-package astiav
+package avgo
 
 //#cgo pkg-config: libavcodec libavutil
 //#include <libavutil/mathematics.h>
 import "C"
 
-// https://github.com/FFmpeg/FFmpeg/blob/n5.0/libavutil/mathematics.h#L79
+// https://github.com/FFmpeg/FFmpeg/blob/n4.4/libavutil/mathematics.h#L79
 type Rounding C.enum_AVRounding
 
 const (

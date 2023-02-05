@@ -1,4 +1,4 @@
-package astiav_test
+package avgo_test
 
 import (
 	"bytes"
@@ -7,87 +7,87 @@ import (
 	"io/ioutil"
 	"testing"
 
-	"github.com/asticode/go-astiav"
+	"github.com/bubbajoe/avgo"
 	"github.com/stretchr/testify/require"
 )
 
-func videoInputLastVideoFrame() (f *astiav.Frame, err error) {
+func videoInputLastVideoFrame() (f *avgo.Frame, err error) {
 	if global.frame != nil {
 		return global.frame, nil
 	}
 
-	var fc *astiav.FormatContext
+	var fc *avgo.FormatContext
 	if fc, err = videoInputFormatContext(); err != nil {
-		err = fmt.Errorf("astiav_test: getting input format context failed: %w", err)
+		err = fmt.Errorf("avgo_test: getting input format context failed: %w", err)
 		return
 	}
 
-	var cc *astiav.CodecContext
-	var cs *astiav.Stream
+	var cc *avgo.CodecContext
+	var cs *avgo.Stream
 	for _, s := range fc.Streams() {
-		if s.CodecParameters().MediaType() != astiav.MediaTypeVideo {
+		if s.CodecParameters().MediaType() != avgo.MediaTypeVideo {
 			continue
 		}
 
 		cs = s
 
-		c := astiav.FindDecoder(s.CodecParameters().CodecID())
+		c := avgo.FindDecoder(s.CodecParameters().CodecID())
 		if c == nil {
-			err = errors.New("astiav_test: no codec")
+			err = errors.New("avgo_test: no codec")
 			return
 		}
 
-		cc = astiav.AllocCodecContext(c)
+		cc = avgo.AllocCodecContext(c)
 		if cc == nil {
-			err = errors.New("astiav_test: no codec context")
+			err = errors.New("avgo_test: no codec context")
 			return
 		}
 		global.closer.Add(cc.Free)
 
 		if err = cs.CodecParameters().ToCodecContext(cc); err != nil {
-			err = fmt.Errorf("astiav_test: updating codec context failed: %w", err)
+			err = fmt.Errorf("avgo_test: updating codec context failed: %w", err)
 			return
 		}
 
 		if err = cc.Open(c, nil); err != nil {
-			err = fmt.Errorf("astiav_test: opening codec context failed: %w", err)
+			err = fmt.Errorf("avgo_test: opening codec context failed: %w", err)
 			return
 		}
 		break
 	}
 
 	if cs == nil {
-		err = errors.New("astiav_test: no valid video stream")
+		err = errors.New("avgo_test: no valid video stream")
 		return
 	}
 
-	var pkt1 *astiav.Packet
+	var pkt1 *avgo.Packet
 	if pkt1, err = videoInputFirstPacket(); err != nil {
-		err = fmt.Errorf("astiav_test: getting input first packet failed: %w", err)
+		err = fmt.Errorf("avgo_test: getting input first packet failed: %w", err)
 		return
 	}
 
-	pkt2 := astiav.AllocPacket()
+	pkt2 := avgo.AllocPacket()
 	global.closer.Add(pkt2.Free)
 
-	f = astiav.AllocFrame()
+	f = avgo.AllocFrame()
 	global.closer.Add(f.Free)
 
-	lastFrame := astiav.AllocFrame()
+	lastFrame := avgo.AllocFrame()
 	global.closer.Add(lastFrame.Free)
 
-	pkts := []*astiav.Packet{pkt1}
+	pkts := []*avgo.Packet{pkt1}
 	for {
 		if err = fc.ReadFrame(pkt2); err != nil {
-			if errors.Is(err, astiav.ErrEof) || errors.Is(err, astiav.ErrEagain) {
+			if errors.Is(err, avgo.ErrEof) || errors.Is(err, avgo.ErrEagain) {
 				if err = f.Ref(lastFrame); err != nil {
-					err = fmt.Errorf("astiav_test: refing frame failed: %w", err)
+					err = fmt.Errorf("avgo_test: refing frame failed: %w", err)
 					return
 				}
 				err = nil
 				break
 			}
-			err = fmt.Errorf("astiav_test: reading frame failed: %w", err)
+			err = fmt.Errorf("avgo_test: reading frame failed: %w", err)
 			return
 		}
 
@@ -99,28 +99,28 @@ func videoInputLastVideoFrame() (f *astiav.Frame, err error) {
 			}
 
 			if err = cc.SendPacket(pkt); err != nil {
-				err = fmt.Errorf("astiav_test: sending packet failed: %w", err)
+				err = fmt.Errorf("avgo_test: sending packet failed: %w", err)
 				return
 			}
 
 			for {
 				if err = cc.ReceiveFrame(f); err != nil {
-					if errors.Is(err, astiav.ErrEof) || errors.Is(err, astiav.ErrEagain) {
+					if errors.Is(err, avgo.ErrEof) || errors.Is(err, avgo.ErrEagain) {
 						err = nil
 						break
 					}
-					err = fmt.Errorf("astiav_test: receiving frame failed: %w", err)
+					err = fmt.Errorf("avgo_test: receiving frame failed: %w", err)
 					return
 				}
 
 				if err = lastFrame.Ref(f); err != nil {
-					err = fmt.Errorf("astiav_test: refing frame failed: %w", err)
+					err = fmt.Errorf("avgo_test: refing frame failed: %w", err)
 					return
 				}
 			}
 		}
 
-		pkts = []*astiav.Packet{}
+		pkts = []*avgo.Packet{}
 	}
 	return
 }
@@ -135,26 +135,26 @@ func TestFrame(t *testing.T) {
 	require.Equal(t, int64(60928), f1.PktDts())
 	require.Equal(t, int64(60928), f1.PktPts())
 
-	f2 := astiav.AllocFrame()
+	f2 := avgo.AllocFrame()
 	require.NotNil(t, f2)
 	defer f2.Free()
-	f2.SetChannelLayout(astiav.ChannelLayout21)
+	f2.SetChannelLayout(avgo.ChannelLayout21)
 	f2.SetHeight(2)
 	f2.SetKeyFrame(true)
 	f2.SetNbSamples(4)
-	f2.SetPictureType(astiav.PictureTypeB)
-	f2.SetPixelFormat(astiav.PixelFormat0Bgr)
-	require.Equal(t, astiav.PixelFormat0Bgr, f2.PixelFormat()) // Need to test it right away as sample format actually updates the same field
+	f2.SetPictureType(avgo.PictureTypeB)
+	f2.SetPixelFormat(avgo.PixelFormat0Bgr)
+	require.Equal(t, avgo.PixelFormat0Bgr, f2.PixelFormat()) // Need to test it right away as sample format actually updates the same field
 	f2.SetPts(7)
-	f2.SetSampleFormat(astiav.SampleFormatDbl)
-	require.Equal(t, astiav.SampleFormatDbl, f2.SampleFormat())
+	f2.SetSampleFormat(avgo.SampleFormatDbl)
+	require.Equal(t, avgo.SampleFormatDbl, f2.SampleFormat())
 	f2.SetSampleRate(9)
 	f2.SetWidth(10)
-	require.Equal(t, astiav.ChannelLayout21, f2.ChannelLayout())
+	require.Equal(t, avgo.ChannelLayout21, f2.ChannelLayout())
 	require.Equal(t, 2, f2.Height())
 	require.True(t, f2.KeyFrame())
 	require.Equal(t, 4, f2.NbSamples())
-	require.Equal(t, astiav.PictureTypeB, f2.PictureType())
+	require.Equal(t, avgo.PictureTypeB, f2.PictureType())
 	require.Equal(t, int64(7), f2.Pts())
 	require.Equal(t, 9, f2.SampleRate())
 	require.Equal(t, 10, f2.Width())
@@ -177,39 +177,39 @@ func TestFrame(t *testing.T) {
 	f3.Unref()
 	require.Equal(t, 0, f3.Height())
 
-	f4 := astiav.AllocFrame()
+	f4 := avgo.AllocFrame()
 	require.NotNil(t, f4)
 	defer f4.Free()
 	f4.SetNbSamples(960)
-	f4.SetChannelLayout(astiav.ChannelLayoutStereo)
-	f4.SetSampleFormat(astiav.SampleFormatS16)
+	f4.SetChannelLayout(avgo.ChannelLayoutStereo)
+	f4.SetSampleFormat(avgo.SampleFormatS16)
 	f4.SetSampleRate(48000)
 	err = f4.AllocBuffer(0)
 	require.NoError(t, err)
 	err = f4.AllocSamples(0)
 	require.NoError(t, err)
 
-	f5 := astiav.AllocFrame()
+	f5 := avgo.AllocFrame()
 	require.NotNil(t, f5)
 	defer f5.Free()
-	sd := f5.NewSideData(astiav.FrameSideDataTypeAudioServiceType, 4)
+	sd := f5.NewSideData(avgo.FrameSideDataTypeAudioServiceType, 4)
 	require.NotNil(t, sd)
 	sd.SetData([]byte{1, 2, 3})
-	sd = f5.SideData(astiav.FrameSideDataTypeAudioServiceType)
+	sd = f5.SideData(avgo.FrameSideDataTypeAudioServiceType)
 	require.NotNil(t, sd)
-	require.Equal(t, astiav.FrameSideDataTypeAudioServiceType, sd.Type())
+	require.Equal(t, avgo.FrameSideDataTypeAudioServiceType, sd.Type())
 	require.True(t, bytes.HasPrefix(sd.Data(), []byte{1, 2, 3}))
 	require.Len(t, sd.Data(), 4)
 	sd.SetData([]byte{1, 2, 3, 4, 5})
-	sd = f5.SideData(astiav.FrameSideDataTypeAudioServiceType)
+	sd = f5.SideData(avgo.FrameSideDataTypeAudioServiceType)
 	require.NotNil(t, sd)
 	require.Equal(t, []byte{1, 2, 3, 4}, sd.Data())
 
-	f6 := astiav.AllocFrame()
+	f6 := avgo.AllocFrame()
 	require.NotNil(t, f6)
 	defer f6.Free()
 	f6.SetHeight(2)
-	f6.SetPixelFormat(astiav.PixelFormatYuv420P)
+	f6.SetPixelFormat(avgo.PixelFormatYuv420P)
 	f6.SetWidth(4)
 	require.NoError(t, f6.AllocBuffer(0))
 	require.NoError(t, f6.AllocImage(0))

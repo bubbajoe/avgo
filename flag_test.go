@@ -1,4 +1,4 @@
-package astiav
+package avgo
 
 import (
 	"testing"

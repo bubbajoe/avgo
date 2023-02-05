@@ -7,7 +7,7 @@ import (
 	"log"
 	"strings"
 
-	"github.com/asticode/go-astiav"
+	"github.com/bubbajoe/avgo"
 )
 
 var (
@@ -15,15 +15,15 @@ var (
 )
 
 type stream struct {
-	decCodec        *astiav.Codec
-	decCodecContext *astiav.CodecContext
-	inputStream     *astiav.Stream
+	decCodec        *avgo.Codec
+	decCodecContext *avgo.CodecContext
+	inputStream     *avgo.Stream
 }
 
 func main() {
 	// Handle ffmpeg logs
-	astiav.SetLogLevel(astiav.LogLevelDebug)
-	astiav.SetLogCallback(func(l astiav.LogLevel, fmt, msg, parent string) {
+	avgo.SetLogLevel(avgo.LogLevelDebug)
+	avgo.SetLogCallback(func(l avgo.LogLevel, fmt, msg, parent string) {
 		log.Printf("ffmpeg log: %s (level: %d)\n", strings.TrimSpace(msg), l)
 	})
 
@@ -37,15 +37,15 @@ func main() {
 	}
 
 	// Alloc packet
-	pkt := astiav.AllocPacket()
+	pkt := avgo.AllocPacket()
 	defer pkt.Free()
 
 	// Alloc frame
-	f := astiav.AllocFrame()
+	f := avgo.AllocFrame()
 	defer f.Free()
 
 	// Alloc input format context
-	inputFormatContext := astiav.AllocFormatContext()
+	inputFormatContext := avgo.AllocFormatContext()
 	if inputFormatContext == nil {
 		log.Fatal(errors.New("main: input format context is nil"))
 	}
@@ -66,8 +66,8 @@ func main() {
 	streams := make(map[int]*stream) // Indexed by input stream index
 	for _, is := range inputFormatContext.Streams() {
 		// Only process audio or video
-		if is.CodecParameters().MediaType() != astiav.MediaTypeAudio &&
-			is.CodecParameters().MediaType() != astiav.MediaTypeVideo {
+		if is.CodecParameters().MediaType() != avgo.MediaTypeAudio &&
+			is.CodecParameters().MediaType() != avgo.MediaTypeVideo {
 			continue
 		}
 
@@ -75,12 +75,12 @@ func main() {
 		s := &stream{inputStream: is}
 
 		// Find decoder
-		if s.decCodec = astiav.FindDecoder(is.CodecParameters().CodecID()); s.decCodec == nil {
+		if s.decCodec = avgo.FindDecoder(is.CodecParameters().CodecID()); s.decCodec == nil {
 			log.Fatal(errors.New("main: codec is nil"))
 		}
 
 		// Alloc codec context
-		if s.decCodecContext = astiav.AllocCodecContext(s.decCodec); s.decCodecContext == nil {
+		if s.decCodecContext = avgo.AllocCodecContext(s.decCodec); s.decCodecContext == nil {
 			log.Fatal(errors.New("main: codec context is nil"))
 		}
 		defer s.decCodecContext.Free()
@@ -103,7 +103,7 @@ func main() {
 	for {
 		// Read frame
 		if err := inputFormatContext.ReadFrame(pkt); err != nil {
-			if errors.Is(err, astiav.ErrEof) {
+			if errors.Is(err, avgo.ErrEof) {
 				break
 			}
 			log.Fatal(fmt.Errorf("main: reading frame failed: %w", err))
@@ -124,7 +124,7 @@ func main() {
 		for {
 			// Receive frame
 			if err := s.decCodecContext.ReceiveFrame(f); err != nil {
-				if errors.Is(err, astiav.ErrEof) || errors.Is(err, astiav.ErrEagain) {
+				if errors.Is(err, avgo.ErrEof) || errors.Is(err, avgo.ErrEagain) {
 					break
 				}
 				log.Fatal(fmt.Errorf("main: receiving frame failed: %w", err))

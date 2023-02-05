@@ -1,10 +1,10 @@
-package astiav
+package avgo
 
 //#cgo pkg-config: libavcodec
 //#include <libavcodec/avcodec.h>
 import "C"
 
-// https://github.com/FFmpeg/FFmpeg/blob/n5.0/libavcodec/packet.h#L40
+// https://github.com/FFmpeg/FFmpeg/blob/n4.4/libavcodec/packet.h#L40
 type PacketSideDataType C.enum_AVPacketSideDataType
 
 const (

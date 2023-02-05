@@ -1,4 +1,4 @@
-package astiav
+package avgo
 
 //#cgo pkg-config: libavcodec
 //#include <libavcodec/avcodec.h>
@@ -6,7 +6,7 @@ import "C"
 
 type Profile int
 
-// https://github.com/FFmpeg/FFmpeg/blob/n5.0/libavcodec/avcodec.h#L1526
+// https://github.com/FFmpeg/FFmpeg/blob/n4.4/libavcodec/avcodec.h#L1526
 const (
 	ProfileAacEld                            = Profile(C.FF_PROFILE_AAC_ELD)
 	ProfileAacHe                             = Profile(C.FF_PROFILE_AAC_HE)

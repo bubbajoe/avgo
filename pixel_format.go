@@ -1,4 +1,4 @@
-package astiav
+package avgo
 
 //#cgo pkg-config: libavcodec libavutil
 //#include <libavcodec/avcodec.h>
@@ -8,7 +8,7 @@ package astiav
 import "C"
 import "unsafe"
 
-// https://github.com/FFmpeg/FFmpeg/blob/n5.0/libavutil/pixfmt.h#L64
+// https://github.com/FFmpeg/FFmpeg/blob/n4.4/libavutil/pixfmt.h#L64
 type PixelFormat C.enum_AVPixelFormat
 
 const (

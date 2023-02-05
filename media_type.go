@@ -1,11 +1,11 @@
-package astiav
+package avgo
 
 //#cgo pkg-config: libavcodec libavutil
 //#include <libavcodec/avcodec.h>
 //#include <libavutil/avutil.h>
 import "C"
 
-// https://github.com/FFmpeg/FFmpeg/blob/n5.0/libavutil/avutil.h#L199
+// https://github.com/FFmpeg/FFmpeg/blob/n4.4/libavutil/avutil.h#L199
 type MediaType C.enum_AVMediaType
 
 const (

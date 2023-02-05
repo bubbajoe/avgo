@@ -1,4 +1,4 @@
-package astiav
+package avgo
 
 //#cgo pkg-config: libavutil
 //#include <stdlib.h>
@@ -6,9 +6,9 @@ package astiav
 /*
 #include <stdio.h>
 
-extern void goAstiavLogCallback(int level, char* fmt, char* msg, char* parent);
+extern void goavgoLogCallback(int level, char* fmt, char* msg, char* parent);
 
-static inline void astiavLogCallback(void *avcl, int level, const char *fmt, va_list vl)
+static inline void avgoLogCallback(void *avcl, int level, const char *fmt, va_list vl)
 {
 	if (level > av_log_get_level()) return;
 	AVClass* avc = avcl ? *(AVClass **) avcl : NULL;
@@ -18,17 +18,17 @@ static inline void astiavLogCallback(void *avcl, int level, const char *fmt, va_
 	}
 	char msg[1024];
 	vsprintf(msg, fmt, vl);
-	goAstiavLogCallback(level, (char*)(fmt), msg, parent);
+	goavgoLogCallback(level, (char*)(fmt), msg, parent);
 }
-static inline void astiavSetLogCallback()
+static inline void avgoSetLogCallback()
 {
-	av_log_set_callback(astiavLogCallback);
+	av_log_set_callback(avgoLogCallback);
 }
-static inline void astiavResetLogCallback()
+static inline void avgoResetLogCallback()
 {
 	av_log_set_callback(av_log_default_callback);
 }
-static inline void astiavLog(int level, const char *fmt)
+static inline void avgoLog(int level, const char *fmt)
 {
 	av_log(NULL, level, fmt, NULL);
 }
@@ -41,7 +41,7 @@ import (
 
 type LogLevel int
 
-// https://github.com/FFmpeg/FFmpeg/blob/n5.0/libavutil/log.h#L162
+// https://github.com/FFmpeg/FFmpeg/blob/n4.4/libavutil/log.h#L162
 const (
 	LogLevelQuiet   = LogLevel(C.AV_LOG_QUIET)
 	LogLevelPanic   = LogLevel(C.AV_LOG_PANIC)
@@ -85,11 +85,11 @@ var logCallback LogCallback
 
 func SetLogCallback(c LogCallback) {
 	logCallback = c
-	C.astiavSetLogCallback()
+	C.avgoSetLogCallback()
 }
 
-//export goAstiavLogCallback
-func goAstiavLogCallback(level C.int, fmt, msg, parent *C.char) {
+//export goavgoLogCallback
+func goavgoLogCallback(level C.int, fmt, msg, parent *C.char) {
 	if logCallback == nil {
 		return
 	}
@@ -97,17 +97,17 @@ func goAstiavLogCallback(level C.int, fmt, msg, parent *C.char) {
 }
 
 func ResetLogCallback() {
-	C.astiavResetLogCallback()
+	C.avgoResetLogCallback()
 }
 
 func Log(l LogLevel, msg string) {
 	msgc := C.CString(msg)
 	defer C.free(unsafe.Pointer(msgc))
-	C.astiavLog(C.int(l), msgc)
+	C.avgoLog(C.int(l), msgc)
 }
 
 func Logf(l LogLevel, msg string, args ...interface{}) {
 	msgc := C.CString(fmt.Sprintf(msg, args...))
 	defer C.free(unsafe.Pointer(msgc))
-	C.astiavLog(C.int(l), msgc)
+	C.avgoLog(C.int(l), msgc)
 }

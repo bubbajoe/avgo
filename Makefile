@@ -1,4 +1,4 @@
-version = "n4.4.1"
+version = "n4.4"
 srcPath = "tmp/$(version)/src"
 
 generate-flags:

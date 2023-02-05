@@ -1,11 +1,11 @@
-package astiav
+package avgo
 
 //#cgo pkg-config: libavcodec libavformat
 //#include <libavcodec/avcodec.h>
 //#include <libavformat/avformat.h>
 import "C"
 
-// https://github.com/FFmpeg/FFmpeg/blob/n5.0/libavcodec/codec_id.h#L47
+// https://github.com/FFmpeg/FFmpeg/blob/n4.4/libavcodec/codec_id.h#L47
 type CodecID C.enum_AVCodecID
 
 const (

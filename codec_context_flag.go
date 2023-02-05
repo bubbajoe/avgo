@@ -1,4 +1,4 @@
-package astiav
+package avgo
 
 //#cgo pkg-config: libavcodec
 //#include <libavcodec/avcodec.h>
@@ -6,7 +6,7 @@ import "C"
 
 type CodecContextFlag int
 
-// https://github.com/FFmpeg/FFmpeg/blob/n5.0/libavcodec/avcodec.h#L206
+// https://github.com/FFmpeg/FFmpeg/blob/n4.4/libavcodec/avcodec.h#L206
 const (
 	CodecContextFlagUnaligned     = CodecContextFlag(C.AV_CODEC_FLAG_UNALIGNED)
 	CodecContextFlagQscale        = CodecContextFlag(C.AV_CODEC_FLAG_QSCALE)
@@ -30,7 +30,7 @@ const (
 
 type CodecContextFlag2 int
 
-// https://github.com/FFmpeg/FFmpeg/blob/n5.0/libavcodec/avcodec.h#L287
+// https://github.com/FFmpeg/FFmpeg/blob/n4.4/libavcodec/avcodec.h#L287
 const (
 	CodecFlag2Fast              = CodecContextFlag2(C.AV_CODEC_FLAG2_FAST)
 	CodecFlag2NoOutput          = CodecContextFlag2(C.AV_CODEC_FLAG2_NO_OUTPUT)

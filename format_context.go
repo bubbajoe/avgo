@@ -1,16 +1,16 @@
-package astiav
+package avgo
 
 //#cgo pkg-config: libavcodec libavformat
 //#include <libavcodec/avcodec.h>
 //#include <libavformat/avformat.h>
 /*
-int astiavInterruptCallback(void *ret)
+int avgoInterruptCallback(void *ret)
 {
     return *((int*)ret);
 }
-AVIOInterruptCB astiavNewInterruptCallback(int *ret)
+AVIOInterruptCB avgoNewInterruptCallback(int *ret)
 {
-	AVIOInterruptCB c = { astiavInterruptCallback, ret };
+	AVIOInterruptCB c = { avgoInterruptCallback, ret };
 	return c;
 }
 */
@@ -24,7 +24,7 @@ const (
 	maxArraySize = math.MaxInt32 - 1
 )
 
-// https://github.com/FFmpeg/FFmpeg/blob/n5.0/libavformat/avformat.h#L1202
+// https://github.com/FFmpeg/FFmpeg/blob/n4.4/libavformat/avformat.h#L1202
 type FormatContext struct {
 	c *C.struct_AVFormatContext
 }
@@ -107,7 +107,7 @@ func (fc *FormatContext) SetFlags(f FormatContextFlags) {
 
 func (fc *FormatContext) SetInterruptCallback() *int {
 	ret := 0
-	fc.c.interrupt_callback = C.astiavNewInterruptCallback((*C.int)(unsafe.Pointer(&ret)))
+	fc.c.interrupt_callback = C.avgoNewInterruptCallback((*C.int)(unsafe.Pointer(&ret)))
 	return &ret
 }
 
@@ -214,6 +214,11 @@ func (fc *FormatContext) ReadFrame(p *Packet) error {
 
 func (fc *FormatContext) SeekFrame(streamIndex int, timestamp int64, f SeekFlags) error {
 	return newError(C.av_seek_frame(fc.c, C.int(streamIndex), C.int64_t(timestamp), C.int(f)))
+}
+
+func (fc *FormatContext) SeekFile(streamIndex int, minTs, ts, maxTs int64, f SeekFlags) error {
+	return newError(C.avformat_seek_file(fc.c, C.int(streamIndex),
+		C.int64_t(minTs), C.int64_t(ts), C.int64_t(maxTs), C.int(f)))
 }
 
 func (fc *FormatContext) Flush() error {

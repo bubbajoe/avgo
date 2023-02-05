@@ -1,4 +1,4 @@
-package astiav
+package avgo
 
 //#cgo pkg-config: libavutil
 //#include <libavutil/channel_layout.h>
@@ -9,7 +9,7 @@ import "C"
 
 const NumDataPointers = uint(C.AV_NUM_DATA_POINTERS)
 
-// https://github.com/FFmpeg/FFmpeg/blob/n5.0/libavutil/frame.h#L317
+// https://github.com/FFmpeg/FFmpeg/blob/n4.4/libavutil/frame.h#L317
 type Frame struct {
 	c *C.struct_AVFrame
 }
@@ -169,14 +169,18 @@ func (f *Frame) Ref(src *Frame) error {
 	return newError(C.av_frame_ref(f.c, src.c))
 }
 
-func (f *Frame) Clone() *Frame {
-	return newFrameFromC(C.av_frame_clone(f.c))
-}
-
 func (f *Frame) Unref() {
 	C.av_frame_unref(f.c)
 }
 
 func (f *Frame) MoveRef(src *Frame) {
 	C.av_frame_move_ref(f.c, src.c)
+}
+
+func (f *Frame) Clone() *Frame {
+	return newFrameFromC(C.av_frame_clone(f.c))
+}
+
+func (f *Frame) Copy(cf *Frame) error {
+	return newError(C.av_frame_copy(cf.c, f.c))
 }

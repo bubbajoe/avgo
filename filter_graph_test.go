@@ -1,45 +1,45 @@
-package astiav_test
+package avgo_test
 
 import (
 	"fmt"
 	"strconv"
 	"testing"
 
-	"github.com/asticode/go-astiav"
+	"github.com/bubbajoe/avgo"
 	"github.com/stretchr/testify/require"
 )
 
 func TestFilterGraph(t *testing.T) {
-	fg := astiav.AllocFilterGraph()
+	fg := avgo.AllocFilterGraph()
 	defer fg.Free()
 
-	bufferSink := astiav.FindFilterByName("buffersink")
+	bufferSink := avgo.FindFilterByName("buffersink")
 	require.NotNil(t, bufferSink)
 
 	fcOut, err := fg.NewFilterContext(bufferSink, "filter_out", nil)
 	require.NoError(t, err)
 	defer fcOut.Free()
 
-	inputs := astiav.AllocFilterInOut()
+	inputs := avgo.AllocFilterInOut()
 	defer inputs.Free()
 	inputs.SetName("out")
 	inputs.SetFilterContext(fcOut)
 	inputs.SetPadIdx(0)
 	inputs.SetNext(nil)
 
-	var outputs *astiav.FilterInOut
+	var outputs *avgo.FilterInOut
 	defer func() {
 		if outputs != nil {
 			outputs.Free()
 		}
 	}()
-	var fcIns []*astiav.FilterContext
+	var fcIns []*avgo.FilterContext
 	for i := 0; i < 2; i++ {
-		bufferSrc := astiav.FindFilterByName("buffer")
+		bufferSrc := avgo.FindFilterByName("buffer")
 		require.NotNil(t, bufferSrc)
 
-		fcIn, err := fg.NewFilterContext(bufferSrc, fmt.Sprintf("filter_in_%d", i+1), astiav.FilterArgs{
-			"pix_fmt":      strconv.Itoa(int(astiav.PixelFormatYuv420P)),
+		fcIn, err := fg.NewFilterContext(bufferSrc, fmt.Sprintf("filter_in_%d", i+1), avgo.FilterArgs{
+			"pix_fmt":      strconv.Itoa(int(avgo.PixelFormatYuv420P)),
 			"pixel_aspect": "1/1",
 			"time_base":    "1/1000",
 			"video_size":   "1x1",
@@ -48,7 +48,7 @@ func TestFilterGraph(t *testing.T) {
 		fcIns = append(fcIns, fcIn)
 		defer fcIn.Free()
 
-		o := astiav.AllocFilterInOut()
+		o := avgo.AllocFilterInOut()
 		o.SetName(fmt.Sprintf("input_%d", i+1))
 		o.SetFilterContext(fcIn)
 		o.SetPadIdx(0)
@@ -65,19 +65,19 @@ func TestFilterGraph(t *testing.T) {
 
 	require.Equal(t, 1, fcOut.NbInputs())
 	require.Equal(t, 1, len(fcOut.Inputs()))
-	require.Equal(t, astiav.NewRational(1, 1000), fcOut.Inputs()[0].TimeBase())
+	require.Equal(t, avgo.NewRational(1, 1000), fcOut.Inputs()[0].TimeBase())
 	require.Equal(t, 0, fcOut.NbOutputs())
 	for _, fc := range fcIns {
 		require.Equal(t, 0, fc.NbInputs())
 		require.Equal(t, 1, fc.NbOutputs())
 		require.Equal(t, 1, len(fc.Outputs()))
-		require.Equal(t, astiav.NewRational(1, 1000), fc.Outputs()[0].TimeBase())
+		require.Equal(t, avgo.NewRational(1, 1000), fc.Outputs()[0].TimeBase())
 	}
 
-	resp, err := fg.SendCommand("scale", "invalid", "a", astiav.NewFilterCommandFlags())
+	resp, err := fg.SendCommand("scale", "invalid", "a", avgo.NewFilterCommandFlags())
 	require.Error(t, err)
 	require.Empty(t, resp)
-	resp, err = fg.SendCommand("scale", "width", "4", astiav.NewFilterCommandFlags().Add(astiav.FilterCommandFlagOne))
+	resp, err = fg.SendCommand("scale", "width", "4", avgo.NewFilterCommandFlags().Add(avgo.FilterCommandFlagOne))
 	require.NoError(t, err)
 	require.Empty(t, resp)
 

@@ -1,3 +1,3 @@
-package astiav
+package avgo
 
 type CodecTag uint32

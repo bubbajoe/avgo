@@ -1,10 +1,10 @@
-package astiav
+package avgo
 
 //#cgo pkg-config: libavutil
 //#include <libavutil/samplefmt.h>
 import "C"
 
-// https://github.com/FFmpeg/FFmpeg/blob/n5.0/libavutil/samplefmt.h#L58
+// https://github.com/FFmpeg/FFmpeg/blob/n4.4/libavutil/samplefmt.h#L58
 type SampleFormat C.enum_AVSampleFormat
 
 const (

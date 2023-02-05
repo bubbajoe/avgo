@@ -1,14 +1,14 @@
-package astiav_test
+package avgo_test
 
 import (
 	"testing"
 
-	"github.com/asticode/go-astiav"
+	"github.com/bubbajoe/avgo"
 	"github.com/stretchr/testify/require"
 )
 
 func TestRational(t *testing.T) {
-	r := astiav.NewRational(2, 1)
+	r := avgo.NewRational(2, 1)
 	require.Equal(t, 2, r.Num())
 	require.Equal(t, 1, r.Den())
 	r.SetNum(1)

@@ -1,4 +1,4 @@
-package astiav_test
+package avgo_test
 
 import (
 	"io"
@@ -8,15 +8,15 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/asticode/go-astiav"
+	"github.com/bubbajoe/avgo"
 	"github.com/stretchr/testify/require"
 )
 
 func TestIOContext_Open_ReadWriteSeek(t *testing.T) {
-	c := astiav.NewIOContext()
+	c := avgo.NewIOContext()
 	path := filepath.Join(t.TempDir(), "iocontext.txt")
 
-	err := c.Open(path, astiav.NewIOContextFlags(astiav.IOContextFlagWrite))
+	err := c.Open(path, avgo.NewIOContextFlags(avgo.IOContextFlagWrite))
 	require.NoError(t, err)
 
 	err = c.Write(nil)
@@ -32,8 +32,8 @@ func TestIOContext_Open_ReadWriteSeek(t *testing.T) {
 	require.NoError(t, err)
 
 	// Read Test
-	c = astiav.NewIOContext()
-	err = c.Open(path, astiav.NewIOContextFlags(astiav.IOContextFlagRead))
+	c = avgo.NewIOContext()
+	err = c.Open(path, avgo.NewIOContextFlags(avgo.IOContextFlagRead))
 	require.NoError(t, err)
 
 	d := make([]byte, 32768)
@@ -55,14 +55,14 @@ func TestIOContext_Open_ReadWriteSeek(t *testing.T) {
 }
 
 func TestIOContext_OpenWith_Write(t *testing.T) {
-	c := astiav.NewIOContext()
+	c := avgo.NewIOContext()
 	path := filepath.Join(t.TempDir(), "iocontext.txt")
 
-	dict := astiav.NewDictionary()
+	dict := avgo.NewDictionary()
 	defer dict.Free()
 	dict.Set("test", "test", 0)
-	err := c.OpenWith(path, astiav.NewIOContextFlags(
-		astiav.IOContextFlagReadWrite), dict)
+	err := c.OpenWith(path, avgo.NewIOContextFlags(
+		avgo.IOContextFlagReadWrite), dict)
 	require.NoError(t, err)
 
 	err = c.Write(nil)
@@ -88,7 +88,7 @@ func TestIOContext_OpenWith_Write(t *testing.T) {
 
 func TestIOContext_BufferReader(t *testing.T) {
 	buffer := randomBytes(1024 * 1024)
-	c := astiav.AllocIOContextBufferReader(buffer)
+	c := avgo.AllocIOContextBufferReader(buffer)
 	defer c.Free()
 
 	buf := make([]byte, 256)
@@ -99,12 +99,12 @@ func TestIOContext_BufferReader(t *testing.T) {
 	// Error expected because write is not supported
 	err = c.Write(buf)
 	require.Error(t, err)
-	require.True(t, astiav.ErrEio.Is(err))
+	require.True(t, avgo.ErrEio.Is(err))
 }
 
 func TestIOContext_ReadSeeker(t *testing.T) {
 	f := createTestFile(t, string(randomBytes(256)))
-	c := astiav.AllocIOContextReadSeeker(f)
+	c := avgo.AllocIOContextReadSeeker(f)
 	defer c.Free()
 
 	buf1 := make([]byte, 256)
@@ -124,7 +124,7 @@ func TestIOContext_ReadSeeker(t *testing.T) {
 
 func TestIOContext_BufferReadSeeker(t *testing.T) {
 	buffer := randomBytes(1024 * 1024)
-	c := astiav.AllocIOContextBufferReader(buffer)
+	c := avgo.AllocIOContextBufferReader(buffer)
 	defer c.Free()
 
 	buf1 := make([]byte, 256)
@@ -145,7 +145,7 @@ func TestIOContext_BufferReadSeeker(t *testing.T) {
 func TestIOContext_WriteSeeker(t *testing.T) {
 	randBytes := randomBytes(256)
 	f := createTestFile(t, string(randBytes))
-	c := astiav.AllocIOContextWriteSeeker(f)
+	c := avgo.AllocIOContextWriteSeeker(f)
 	defer c.Free()
 
 	err := c.Write(randBytes)
@@ -163,15 +163,15 @@ func TestIOContext_WriteSeeker(t *testing.T) {
 
 	n, err = c.Read(make([]byte, 256))
 	require.Error(t, err)
-	require.True(t, astiav.ErrEio.Is(err))
-	require.Equal(t, int(astiav.ErrEio), n)
+	require.True(t, avgo.ErrEio.Is(err))
+	require.Equal(t, int(avgo.ErrEio), n)
 }
 
 func TestIOContext_BufferWriteSeeker(t *testing.T) {
 	rbuffer := randomBytes(1024)
 	buffer := make([]byte, 1024)
 
-	c := astiav.AllocIOContextBufferWriter(buffer)
+	c := avgo.AllocIOContextBufferWriter(buffer)
 	defer c.Free()
 
 	err := c.Write(rbuffer)
@@ -185,19 +185,19 @@ func TestIOContext_BufferWriteSeeker(t *testing.T) {
 
 	// Error expected because read is not supported
 	n, err := c.Read(make([]byte, 256))
-	require.True(t, astiav.ErrEio.Is(err))
-	require.Equal(t, int(astiav.ErrEio), n)
+	require.True(t, avgo.ErrEio.Is(err))
+	require.Equal(t, int(avgo.ErrEio), n)
 }
 
 func TestIOContext_CallbacksWriteRead(t *testing.T) {
 	byteArr := make([]byte, 64)
 	size := 0
 	pos := 0
-	c := astiav.AllocIOContextCallback(
+	c := avgo.AllocIOContextCallback(
 		func(buf []byte) int {
 			min := len(buf)
 			if pos >= size {
-				return int(astiav.ErrEof)
+				return int(avgo.ErrEof)
 			}
 			if size < min {
 				min = size
@@ -243,7 +243,7 @@ func TestIOContext_CallbacksWriteRead(t *testing.T) {
 
 	buf = make([]byte, 64)
 	n, err = c.Read(buf)
-	require.Equal(t, astiav.ErrEof, (astiav.Error)(n))
+	require.Equal(t, avgo.ErrEof, (avgo.Error)(n))
 }
 
 func randomBytes(size int) []byte {
@@ -256,7 +256,7 @@ func randomBytes(size int) []byte {
 }
 
 func BenchmarkIOContext_OpenAndParseAudio(b *testing.B) {
-	astiav.SetLogLevel(astiav.LogLevelError)
+	avgo.SetLogLevel(avgo.LogLevelError)
 
 	b.ResetTimer()
 
@@ -266,7 +266,7 @@ func BenchmarkIOContext_OpenAndParseAudio(b *testing.B) {
 }
 
 func BenchmarkIOContext_OpenAndParseVideo(b *testing.B) {
-	astiav.SetLogLevel(astiav.LogLevelError)
+	avgo.SetLogLevel(avgo.LogLevelError)
 
 	b.ResetTimer()
 
@@ -276,7 +276,7 @@ func BenchmarkIOContext_OpenAndParseVideo(b *testing.B) {
 }
 
 func BenchmarkIOContext_OpenAndParseImage(b *testing.B) {
-	astiav.SetLogLevel(astiav.LogLevelError)
+	avgo.SetLogLevel(avgo.LogLevelError)
 
 	b.ResetTimer()
 
@@ -294,21 +294,21 @@ func openFromReader(b *testing.B, fileName string) {
 
 	b.StartTimer()
 	defer b.StopTimer()
-	fc := astiav.AllocFormatContext()
+	fc := avgo.AllocFormatContext()
 	defer fc.Free()
-	ioCtx := astiav.AllocIOContextReadSeeker(file)
+	ioCtx := avgo.AllocIOContextReadSeeker(file)
 	if ioCtx == nil {
 		b.Fatal("ioCtx is nil")
 	}
 	defer ioCtx.Free()
 	fc.SetPb(ioCtx)
-	dict1 := astiav.NewDictionary()
+	dict1 := avgo.NewDictionary()
 	err = fc.OpenInput("testing", nil, dict1)
 	if err != nil {
 		b.Fatalf("error: %v %d\n", err, err)
 	}
-	fc.SetFlags(fc.Flags().Add(astiav.FormatContextFlagCustomIo))
-	dict2 := astiav.NewDictionary()
+	fc.SetFlags(fc.Flags().Add(avgo.FormatContextFlagCustomIo))
+	dict2 := avgo.NewDictionary()
 	if dict2 == nil {
 		b.Fatal("dict is nil")
 	}
@@ -318,8 +318,8 @@ func openFromReader(b *testing.B, fileName string) {
 		b.Fatal(err)
 	}
 	for _, is := range fc.Streams() {
-		if is.CodecParameters().MediaType() != astiav.MediaTypeAudio &&
-			is.CodecParameters().MediaType() != astiav.MediaTypeVideo {
+		if is.CodecParameters().MediaType() != avgo.MediaTypeAudio &&
+			is.CodecParameters().MediaType() != avgo.MediaTypeVideo {
 			continue
 		}
 	}

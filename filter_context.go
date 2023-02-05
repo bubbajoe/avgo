@@ -1,4 +1,4 @@
-package astiav
+package avgo
 
 //#cgo pkg-config: libavfilter libavutil
 //#include <libavfilter/avfilter.h>
@@ -8,7 +8,7 @@ package astiav
 import "C"
 import "unsafe"
 
-// https://github.com/FFmpeg/FFmpeg/blob/n5.0/libavfilter/avfilter.h#L67
+// https://github.com/FFmpeg/FFmpeg/blob/n4.4/libavfilter/avfilter.h#L67
 type FilterContext struct {
 	c *C.struct_AVFilterContext
 }
@@ -19,6 +19,10 @@ func newFilterContext() *FilterContext {
 
 func (fc *FilterContext) Free() {
 	C.avfilter_free(fc.c)
+}
+
+func (src *FilterContext) Link(srcPad uint, dst *FilterContext, dstPad uint) error {
+	return newError(C.avfilter_link(src.c, C.uint(srcPad), dst.c, C.uint(dstPad)))
 }
 
 func (fc *FilterContext) BuffersrcAddFrame(f *Frame, fs BuffersrcFlags) error {

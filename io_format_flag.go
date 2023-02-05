@@ -1,4 +1,4 @@
-package astiav
+package avgo
 
 //#cgo pkg-config: libavformat
 //#include <libavformat/avformat.h>
@@ -6,7 +6,7 @@ import "C"
 
 type IOFormatFlag int
 
-// https://github.com/FFmpeg/FFmpeg/blob/n5.0/libavformat/avformat.h#L464
+// https://github.com/FFmpeg/FFmpeg/blob/n4.4/libavformat/avformat.h#L464
 const (
 	IOFormatFlagNofile       = IOFormatFlag(C.AVFMT_NOFILE)
 	IOFormatFlagNeednumber   = IOFormatFlag(C.AVFMT_NEEDNUMBER)

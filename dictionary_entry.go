@@ -1,10 +1,10 @@
-package astiav
+package avgo
 
 //#cgo pkg-config: libavutil
 //#include <libavutil/dict.h>
 import "C"
 
-// https://github.com/FFmpeg/FFmpeg/blob/n5.0/libavutil/dict.h#L79
+// https://github.com/FFmpeg/FFmpeg/blob/n4.4/libavutil/dict.h#L79
 type DictionaryEntry struct {
 	c *C.struct_AVDictionaryEntry
 }

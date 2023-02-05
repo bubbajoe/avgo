@@ -1,10 +1,10 @@
-package astiav
+package avgo
 
 //#cgo pkg-config: libavutil
 //#include <libavutil/frame.h>
 import "C"
 
-// https://github.com/FFmpeg/FFmpeg/blob/n5.0/libavutil/frame.h#L48
+// https://github.com/FFmpeg/FFmpeg/blob/n4.4/libavutil/frame.h#L48
 type FrameSideDataType C.enum_AVFrameSideDataType
 
 const (
